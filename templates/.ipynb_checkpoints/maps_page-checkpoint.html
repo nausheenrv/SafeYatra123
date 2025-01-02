@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan your route!</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f8ff; /* Light blue background */
+        }
+        .container-fluid {
+            height: 100vh; /* Full height of the viewport */
+        }
+        .sidebar {
+            width: 200px; /* Set a fixed width for the sidebar */
+            height: 100%; /* Full height */
+            padding: 20px;
+            background-color: #ffffff; /* White background for the sidebar */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .content {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #ffffff; /* White background for the content */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            flex-grow: 1; /* Allow content to take remaining space */
+        }
+        h2 {
+            color: #007bff; /* Bootstrap primary color */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #map {
+            height: 400px; /* Set the height of the map */
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+</head>
+<body>
+    <div class="container-fluid d-flex">
+        <div class="sidebar">
+            <h4>Features</h4>
+            <a href="{{ url_for('guardian_setup') }}" class="btn btn-secondary btn-block">Guardian Setup</a>
+            <a href="{{ url_for('profile_setup') }}" class="btn btn-secondary btn-block">Profile Setup</a> 
+             <a href="{{ url_for('community') }}" class="btn btn-secondary btn-block">Community</a>
+            <a href="{{ url_for('submit_incident') }}" class="btn btn-secondary btn-block">Submit Incident</a>
+        </div>
+        <div class="content">
+            <h2>Plan your route!</h2>
+            <form id="locationForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="currentLocation">Current Location</label>
+                    <input type="text" class="form-control" id="currentLocation" name="currentLocation" placeholder="Enter your current location" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" class="form-control" id="destination" name="destination" placeholder="Enter your destination" required>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" onclick="getDirections()">Get Directions</button>
+            </form>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let directionsService;
+        let directionsRenderer;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 }, // Default center
+                zoom: 8
+            });
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+        }
+
+        function getDirections() {
+            const currentLocation = document.getElementById('currentLocation').value;
+            const destination = document.getElementById('destination').value;
+
+            const request = {
+                origin: currentLocation,
+                destination: destination,
+                travelMode: google.maps.TravelMode.DRIVING // You can change this to BICYCLING, TRANSIT, etc.
+            };
+
+            directionsService.route(request, (result, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                } else {
+                    alert('Directions request failed due to ' + status);
+                }
+            });
+        }
+
+        // Initialize the map when the window loads
+        window.onload = initMap;
+    </script>
+</body>
+</html>

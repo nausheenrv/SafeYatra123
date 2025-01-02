@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Incidents</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome -->
+    <style>
+        body {
+            background-color: #f0f8ff; /* Light blue background */
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        .incident-card {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #ffffff; /* White background for the card */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .incident-image {
+            width: 50%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .vote-buttons {
+            margin-top: 10px;
+        }
+        .back-arrow {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: #007bff; /* Bootstrap primary color */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fas fa-arrow-left back-arrow" onclick="window.location.href='{{ url_for('maps_page') }}'"></i>
+        <h2 class="text-center">Community Incidents</h2>
+        {% for incident in incidents %}
+            <div class="incident-card">
+                <h5>{{ incident.title }}</h5>
+                <img src="{{ incident.image }}" alt="Incident Image" class="incident-image">
+                <p><strong>Description:</strong> {{ incident.description }}</p>
+                <p><strong>Location:</strong> {{ incident.location }}</p>
+                <div class="vote-buttons">
+                    <button class="btn btn-success btn-sm">Upvote <i class="fas fa-thumbs-up"></i> ({{ incident.upvotes }})</button>
+                    <button class="btn btn-danger btn-sm">Downvote <i class="fas fa-thumbs-down"></i> ({{ incident.downvotes }})</button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

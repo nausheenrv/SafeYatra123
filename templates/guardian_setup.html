@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardian Setup</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome -->
+    <style>
+        body {
+            background-color: #f0f8ff; /* Light blue background */
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 100px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #ffffff; /* White background for the form */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            color: #007bff; /* Bootstrap primary color */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .alert {
+            margin-bottom: 20px;
+        }
+        .back-arrow {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: #007bff; /* Bootstrap primary color */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fas fa-arrow-left back-arrow" onclick="window.location.href='{{ url_for('maps_page') }}'"></i>
+        <h2>Guardian Setup</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('guardian_setup') }}">
+            <div class="form-group">
+                <label for="guardian_name">Guardian's Name</label>
+                <input type="text" class="form-control" id="guardian_name" name="guardian_name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Phone Number</label>
+                <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+            </div>
+            <div class="form-group">
+                <label for="email_address">Email Address</label>
+                <input type="email" class="form-control" id="email_address" name="email_address" required>
+            </div>
+            <div class="form-group">
+                <label for="home_address">Home Address</label>
+                <input type="text" class="form-control" id="home_address" name="home_address" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Complete Guardian Setup!</button>
+        </form>
+    </div>
+</body>
+</html>

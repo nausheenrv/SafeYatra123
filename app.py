@@ -210,7 +210,7 @@ def sign_up_2():
 
 @app.route('/maps')
 def maps_page():
-    return render_template('maps_page.html')  # Render the maps page
+    return render_template('maps_page1.html')  # Render the maps page
 
 @app.route('/guardian_setup', methods=['GET', 'POST'])
 def guardian_setup():

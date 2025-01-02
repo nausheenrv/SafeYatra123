@@ -35,7 +35,7 @@
 </head>
 <body>
     <div class="container">
-        <i class="fas fa-arrow-left back-arrow" onclick="window.location.href='{{ url_for('community') }}'"></i>
+        <i class="fas fa-arrow-left back-arrow" onclick="window.location.href='{{ url_for('maps_page') }}'"></i>
         <h2>Submit Incident</h2>
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}

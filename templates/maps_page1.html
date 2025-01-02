@@ -25,9 +25,9 @@
         .top-bar {
             top: 0;
             width: 100%;
-            background-color: #ffffff;
+            /* background-color: #ffffff; */
             padding: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
             display: flex;
             align-items: center;
         }
@@ -40,8 +40,8 @@
             display: none; /* Initially hidden */
         }
         .static-icons {
-            top: 100px;
-            left: 20px;
+            top: 70px;
+            right: 20px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -61,13 +61,18 @@
             width: 60%;
             height: 60%;
         }
+        .btn{
+            background-color: #0c366d;
+            border: #0c366d;
+            color: #ffffff;
+        }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y"></script>
 </head>
 <body>
     <!-- Top Bar -->
     <div class="top-bar">
-        <span class="menu-toggle btn btn-primary" onclick="toggleMenu()" style="color: white;">☰</span>
+        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;"> 
         <input type="text" id="searchBar" class="form-control mx-2" placeholder="Search for a location" style="flex: 1;">
         <button class="btn btn-primary" onclick="searchLocation()">Search</button>
     </div>
@@ -87,8 +92,11 @@
         <div class="icon" onclick="window.location.href='{{ url_for('submit_incident') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/chat.png" alt="Submit Incident">
         </div>
+        <div class="icon" onclick="window.location.href='{{ url_for('maps_page') }}'">
+            <img src="https://img.icons8.com/ios-filled/50/0c366d/map.png" alt="Go to Maps Page">
+        </div>
     </div>
-    
+
 
     <!-- Fullscreen Map -->
     <div id="map"></div>

@@ -155,7 +155,7 @@ def sign_in():
         
         if email in users and users[email] == password:
             flash('Sign in successful!', 'success')
-            return redirect(url_for('maps_page'))  # Redirect to maps page on successful sign-in
+            return redirect(url_for('maps'))  # Redirect to maps page on successful sign-in
         else:
             flash('Invalid email or password', 'danger')
             return redirect(url_for('sign_in'))
@@ -204,15 +204,15 @@ def sign_up_2():
         if temp_user_data['age'] <= 15:
             return redirect(url_for('guardian_setup'))
         else:
-            return redirect(url_for('maps_page'))
+            return redirect(url_for('maps'))
 
     return render_template('sign_up_2.html')
 
-@app.route('/maps_page')
+@app.route('/maps')
 def maps_page():
     return render_template('maps_page.html')  # Render the maps_page.html template
 
-@app.route('/maps')
+@app.route('/maps_page')
 def maps():
     return render_template('maps_page1.html')  # Render the maps_page1.html template
 
@@ -225,7 +225,7 @@ def guardian_setup():
         home_address = request.form['home_address']
         
         flash('Guardian setup complete!', 'success')
-        return redirect(url_for('maps_page'))  # Redirect back to the maps page after submission
+        return redirect(url_for('maps'))  # Redirect back to the maps page after submission
     return render_template('guardian_setup.html')  # Render the guardian setup page
 
 @app.route('/profile_setup', methods=['GET', 'POST'])
@@ -237,7 +237,7 @@ def profile_setup():
         work_address = request.form['work_address']
         
         flash('Profile setup complete!', 'success')
-        return redirect(url_for('maps_page'))  # Redirect back to the maps page after submission
+        return redirect(url_for('maps'))  # Redirect back to the maps page after submission
     return render_template('profile_setup.html')  # Render the profile setup page
 
 @app.route('/community')

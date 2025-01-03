@@ -7,7 +7,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            background-color: #f0f8ff; /* Light blue background */
+            background-image: url('/static/uploads/background.png');
+            background-size: cover; /* Ensures the image covers the entire page */
+            background-repeat: no-repeat; /* Prevents the image from repeating */
+            background-attachment: fixed; /* Keeps the background fixed while scrolling */
+            position: relative; /* Required for the overlay */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -15,17 +19,25 @@
             height: 100vh;
             margin: 0;
         }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.35); /* White with 50% opacity */
+            z-index: -1; /* Place the overlay behind the content */
+        }
         .logo {
-            width: 400px; /* Bigger logo */
+            width: 500px; /* Bigger logo */
             height: auto;
             animation: fadeIn 2s ease-in-out forwards;
         }
-        .buttons, .safeyatra-text {
+        .buttons {
             opacity: 0;
             animation: fadeIn 1s ease-in-out forwards;
             animation-delay: 2s; /* Delay to appear after the logo */
-        }
-        .buttons {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -36,12 +48,49 @@
             padding: 10px 20px;
             font-size: 18px;
             width: 150px;
+            justify-content: center;
+            height: 50px; /* Fixed height */
+            transition: opacity 0.3s ease; /* Smooth transition for hover effect */
         }
-        .safeyatra-text {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #0c366d; /* Changed color to #0c366d */
+        .btn-primary {
+            color: #0c366d; /* Text color for Sign In */
+            background-color: transparent; /* No background */
+            font-weight: bold; /* Bold text */
+            border: none; /* Remove border */
+            justify-content: center;
+        }
+        .btn-success {
+            color: white; /* Text color for Sign Up */
+            background-color: #0c366d; /* Background color */
+            border: 2px solid #0c366d; /* Border color */
+            font-weight: bold; /* Bold text */
+            justify-content: center;
+        }
+        .btn-primary:hover, .btn-success:hover {
+            opacity: 0.8; /* Slight transparency on hover */
+            background-color: transparent; /* Ensure no background color on hover */
+            color: #0c366d; /* Maintain text color for Sign In */
+            border: none;
+            justify-content: center;
+        }
+        .btn-success:hover {
+            background-color: #0c366d; /* Maintain background color for Sign Up */
+            color: white; /* Maintain text color for Sign Up */
+            justify-content: center;
+        }
+        .btn-primary:focus, .btn-success:focus, .btn-primary:active, .btn-success:active {
+            opacity: 0.8 !important; /* Slight transparency on hover */
+            background-color: transparent !important; /* Ensure no background color on hover */
+            color: #0c366d !important; /* Maintain text color for Sign In */
+            border: none !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+        }
+        .btn-success:focus, .btn-success:active {
+            background-color: #0c366d !important; /* Maintain background color for Sign Up */
+            color: white !important; /* Maintain text color for Sign Up */
+            justify-content: center !important;
+            box-shadow: none !important;
         }
         @keyframes fadeIn {
             0% { opacity: 0; }
@@ -53,11 +102,10 @@
     <!-- Logo with fade-in animation -->
     <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="SafeYatra Logo" class="logo">
 
-    <!-- Buttons and text with delayed fade-in animation -->
+    <!-- Buttons with delayed fade-in animation -->
     <div class="buttons">
         <a href="{{ url_for('sign_in') }}" class="btn btn-primary">Sign In</a>
         <a href="{{ url_for('sign_up_1') }}" class="btn btn-success">Sign Up</a>
     </div>
-    <div class="safeyatra-text">SafeYatra</div>
 </body>
 </html>

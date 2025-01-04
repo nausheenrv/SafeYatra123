@@ -65,13 +65,6 @@
     <div class="container">
         <i class="fas fa-arrow-left back-arrow" onclick="window.location.href='{{ url_for('maps') }}'"></i>
         <h2><b>Submit Incident</b></h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
         <form method="POST" action="{{ url_for('submit_incident') }}" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="title">Incident Title</label>

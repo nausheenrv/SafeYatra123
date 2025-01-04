@@ -68,13 +68,6 @@
     <div class="container">
         <i class="fas fa-arrow-left back-arrow" onclick="window.location.href='{{ url_for('maps') }}'"></i>
         <h2><b>Profile Setup</b></h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
         <form method="POST" action="{{ url_for('profile_setup') }}">
             <div class="form-group">
                 <label for="vehicle_number"><b>Vehicle Number</b></label>
@@ -96,4 +89,5 @@
         </form>
     </div>
 </body>
+
 </html>

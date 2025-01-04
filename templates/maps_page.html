@@ -3,166 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safe Routing App</title>
+    <title>Plan your route!</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
+        body {
+            background-color: #f0f8ff; /* Light blue background */
+        }
+        .container-fluid {
+            height: 100vh; /* Full height of the viewport */
+        }
+        .sidebar {
+            width: 200px; /* Set a fixed width for the sidebar */
+            height: 100%; /* Full height */
+            padding: 20px;
+            background-color: #ffffff; /* White background for the sidebar */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .content {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #ffffff; /* White background for the content */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            flex-grow: 1; /* Allow content to take remaining space */
+        }
+        h2 {
+            color: #007bff; /* Bootstrap primary color */
+            text-align: center;
+            margin-bottom: 20px;
         }
         #map {
-            height: 100%;
-            width: 100%;
-            pointer-events: auto; /* Ensure map interactions work */
-        }
-        .top-bar, .directions-form, .static-icons {
-            position: absolute;
-            z-index: 1000;
-            pointer-events: auto; /* Allow interactions */
-        }
-        .top-bar {
-            top: 0;
-            width: 100%;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .directions-form {
-            top: 60px;
-            width: 100%;
-            background-color: #ffffff;
-            padding: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            display: none; /* Initially hidden */
-        }
-        .static-icons {
-            top: 70px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .icon {
-            width: 50px;
-            height: 50px;
-            background-color: #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-        .icon img {
-            width: 60%;
-            height: 60%;
-        }
-        .btn {
-            background-color: #0c366d;
-            border: #0c366d;
-            color: #ffffff;
+            height: 400px; /* Set the height of the map */
+            margin-top: 20px;
+            border-radius: 10px;
         }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y"></script> <!-- Replace YOUR_API_KEY with your actual API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
 </head>
 <body>
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;"> 
-        <input type="text" id="searchBar" class="form-control mx-2" placeholder="Search for a location" style="flex: 1;">
-        <button class="btn btn-primary" onclick="searchLocation()">Search</button>
-    </div>
-
-    <!-- Directions Form -->
-    <div class="directions-form" id="directionsForm">
-        <input type="text" id="startLocation" class="form-control mr-2" placeholder="Start Location" style="flex: 1;">
-        <input type="text" id="endLocation" class="form-control mx-2" placeholder="Destination" style="flex: 1;">
-        <button class="btn btn-primary" onclick="getDirections()">Get Directions</button>
-    </div>
-
-    <!-- Static Icons for Community, Submit Incident, and Nearby Hospitals -->
-    <div class="static-icons">
-        <div class="icon" onclick="window.location.href='{{ url_for('community') }}'">
-            <img src="https://img.icons8.com/ios-filled/50/0c366d/bell.png" alt="Community">
+    <div class="container-fluid d-flex">
+        <div class="sidebar">
+            <h4>Features</h4>
+            <a href="{{ url_for('guardian_setup') }}" class="btn btn-secondary btn-block">Guardian Setup</a>
+            <a href="{{ url_for('profile_setup') }}" class="btn btn-secondary btn-block">Profile Setup</a> 
+             <a href="{{ url_for('community') }}" class="btn btn-secondary btn-block">Community</a>
+            <a href="{{ url_for('submit_incident') }}" class="btn btn-secondary btn-block">Submit Incident</a>
         </div>
-        <div class="icon" onclick="window.location.href='{{ url_for('submit_incident') }}'">
-            <img src="https://img.icons8.com/ios-filled/50/0c366d/chat.png" alt="Submit Incident">
-        </div>
-        <div class="icon" onclick="window.location.href='{{ url_for('maps') }}'">
-            <img src="https://img.icons8.com/ios-filled/50/0c366d/map.png" alt="Go to Maps Page">
-        </div>
-        <div class="icon" onclick="window.location.href='{{ url_for('nearby_hospitals') }}'">
-            <img src="https://img.icons8.com/ios-filled/50/0c366d/hospital-room.png" alt ="Nearby Hospitals">
+        <div class="content">
+            <h2>Plan your route!</h2>
+            <form id="locationForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="currentLocation">Current Location</label>
+                    <input type="text" class="form-control" id="currentLocation" name="currentLocation" placeholder="Enter your current location" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" class="form-control" id="destination" name="destination" placeholder="Enter your destination" required>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" onclick="getDirections()">Get Directions</button>
+            </form>
+            <div id="map"></div>
         </div>
     </div>
-
-    <!-- Fullscreen Map -->
-    <div id="map"></div>
 
     <script>
         let map;
+        let directionsService;
+        let directionsRenderer;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 20.5937, lng: 78.9629 },
-                zoom: 5,
-                disableDefaultUI: true
+                center: { lat: -34.397, lng: 150.644 }, // Default center
+                zoom: 8
             });
-        }
-
-        function toggleMenu() {
-            const menuBar = document.getElementById('menuBar');
-            menuBar.style.display = menuBar.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleDirections() {
-            const directionsForm = document.getElementById('directionsForm');
-            directionsForm.style.display = directionsForm.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function searchLocation() {
-            const location = document.getElementById('searchBar').value;
-            const geocoder = new google.maps.Geocoder();
-
-            geocoder.geocode({ address: location }, (results, status) => {
-                if (status === 'OK') {
-                    map.setCenter(results[0].geometry.location);
-                    map.setZoom(14);
-                    new google.maps.Marker({
-                        map: map,
-                        position: results[0].geometry.location
-                    });
-                } else {
-                    alert('Geocode was not successful due to: ' + status);
-                }
-            });
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
         }
 
         function getDirections() {
-            const startLocation = document.getElementById('startLocation').value;
-            const endLocation = document.getElementById('endLocation').value;
-
-            const directionsService = new google.maps.DirectionsService();
-            const directionsRenderer = new google.maps.DirectionsRenderer();
-            directionsRenderer.setMap(map);
+            const currentLocation = document.getElementById('currentLocation').value;
+            const destination = document.getElementById('destination').value;
 
             const request = {
-                origin: startLocation,
-                destination: endLocation,
-                travelMode: google.maps.TravelMode.DRIVING
+                origin: currentLocation,
+                destination: destination,
+                travelMode: google.maps.TravelMode.DRIVING // You can change this to BICYCLING, TRANSIT, etc.
             };
 
             directionsService.route(request, (result, status) => {
-                if (status === 'OK') {
+                if (status === google.maps.DirectionsStatus.OK) {
                     directionsRenderer.setDirections(result);
                 } else {
-                    alert('Directions request failed due to: ' + status);
+                    alert('Directions request failed due to ' + status);
                 }
             });
         }
 
+        // Initialize the map when the window loads
         window.onload = initMap;
     </script>
 </body>

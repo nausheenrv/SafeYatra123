@@ -25,7 +25,9 @@
         .top-bar {
             top: 0;
             width: 100%;
+            /* background-color: #ffffff; */
             padding: 10px;
+            /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
             display: flex;
             align-items: center;
         }
@@ -59,13 +61,13 @@
             width: 60%;
             height: 60%;
         }
-        .btn {
+        .btn{
             background-color: #0c366d;
             border: #0c366d;
             color: #ffffff;
         }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y"></script> <!-- Replace YOUR_API_KEY with your actual API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y"></script>
 </head>
 <body>
     <!-- Top Bar -->
@@ -82,7 +84,7 @@
         <button class="btn btn-primary" onclick="getDirections()">Get Directions</button>
     </div>
 
-    <!-- Static Icons for Community, Submit Incident, and Nearby Hospitals -->
+    <!-- Static Icons for Community and Submit Incident -->
     <div class="static-icons">
         <div class="icon" onclick="window.location.href='{{ url_for('community') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/bell.png" alt="Community">
@@ -93,10 +95,8 @@
         <div class="icon" onclick="window.location.href='{{ url_for('maps') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/map.png" alt="Go to Maps Page">
         </div>
-        <div class="icon" onclick="window.location.href='{{ url_for('nearby_hospitals') }}'">
-            <img src="https://img.icons8.com/ios-filled/50/0c366d/hospital-room.png" alt ="Nearby Hospitals">
-        </div>
     </div>
+
 
     <!-- Fullscreen Map -->
     <div id="map"></div>
@@ -161,6 +161,10 @@
                     alert('Directions request failed due to: ' + status);
                 }
             });
+        }
+
+        function redirectTo(page) {
+            window.location.href = page; // Redirect to the specified page
         }
 
         window.onload = initMap;

@@ -184,7 +184,6 @@ def sign_up_1():
         # Redirect to the next step
         return redirect(url_for('sign_up_2'))
     return render_template('sign_up_1.html')
-
 @app.route('/sign_up_2', methods=['GET', 'POST'])
 def sign_up_2():
     if request.method == 'POST':
@@ -271,10 +270,6 @@ def submit_incident():
             flash('Incident submitted successfully!', 'success')
             return redirect(url_for('community'))  # Redirect to the community page
     return render_template('submit_incident.html')  # Render the submit incident page
-
-@app.route('/nearby_hospitals')
-def nearby_hospitals():
-    return render_template('nearby_hospitals.html')  # Render the nearby hospitals page
 
 if __name__ == '__main__':
     app.run(debug=True)  # Run the Flask app in debug mode

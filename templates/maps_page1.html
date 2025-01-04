@@ -28,7 +28,6 @@
             padding: 10px;
             display: flex;
             align-items: center;
-            background-color: #ffffff;
         }
         .directions-form {
             top: 60px;
@@ -66,12 +65,12 @@
             color: #ffffff;
         }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y&libraries=places"></script> <!-- Replace YOUR_API_KEY with your actual API key -->
 </head>
 <body>
     <!-- Top Bar -->
     <div class="top-bar">
-        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;">
+        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;"> 
         <input type="text" id="searchBar" class="form-control mx-2" placeholder="Search for a location" style="flex: 1;">
         <button class="btn btn-primary" onclick="searchLocation()">Search</button>
     </div>
@@ -83,12 +82,13 @@
         <button class="btn btn-primary" onclick="getDirections()">Get Directions</button>
     </div>
 
-    <!-- Nearby Hospitals Button -->
-    <div style="position: absolute; top: 60px; left: 20px; z-index: 1000;">
+    <!-- Button to Show Nearby Hospitals and Button to Show Nearby Police Stations -->
+    <div class="top-bar" style="top: 60px;">
         <button class="btn btn-success" onclick="findNearbyHospitals()">Show Nearby Hospitals</button>
+        <button class="btn btn-info" onclick="findNearbyPoliceStations()">Show Nearby Police Stations</button> <!-- New Button -->
     </div>
 
-    <!-- Static Icons -->
+    <!-- Static Icons for Community and Submit Incident -->
     <div class="static-icons">
         <div class="icon" onclick="window.location.href='{{ url_for('community') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/bell.png" alt="Community">
@@ -96,7 +96,7 @@
         <div class="icon" onclick="window.location.href='{{ url_for('submit_incident') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/chat.png" alt="Submit Incident">
         </div>
-        <div class="icon" onclick="window.location.href='{{ url_for('maps') }}'">
+        <div class="icon" onclick="window.location.href='{{ url _for('maps') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/map.png" alt="Go to Maps Page">
         </div>
     </div>
@@ -113,6 +113,16 @@
                 zoom: 5,
                 disableDefaultUI: true
             });
+        }
+
+        function toggleMenu() {
+            const menuBar = document.getElementById('menuBar');
+            menuBar.style.display = menuBar.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleDirections() {
+            const directionsForm = document.getElementById('directionsForm');
+            directionsForm.style.display = directionsForm.style.display === 'flex' ? 'none' : 'flex';
         }
 
         function searchLocation() {
@@ -167,11 +177,13 @@
                     const service = new google.maps.places.PlacesService(map);
                     service.nearbySearch({
                         location: userLocation,
-                        radius: 5000,
+                        radius: 5000, // Search within 5 km
                         type: ['hospital']
                     }, function(results, status) {
                         if (status === google.maps.places.PlacesServiceStatus.OK) {
-                            results.forEach(createMarker);
+                            for (let i = 0; i < results.length; i++) {
+                                createMarker(results[i]);
+                            }
                         } else {
                             alert('Nearby search failed due to: ' + status);
                         }
@@ -189,8 +201,46 @@
                             infowindow.open(map, this);
                         });
                     }
-                }, function(error) {
-                    alert('Error in getting location: ' + error.message);
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function findNearbyPoliceStations() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    const service = new google.maps.places.PlacesService(map);
+                    service.nearbySearch({
+                        location: userLocation,
+                        radius: 5000, // Search within 5 km
+                        type: ['police']
+                    }, function(results, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            for (let i = 0; i < results.length; i++) {
+                                createMarker(results[i]);
+                            }
+                        } else {
+                            alert('Nearby search failed due to: ' + status);
+                        }
+                    });
+
+                    function createMarker(place) {
+                        const marker = new google.maps.Marker({
+                            map: map,
+                            position: place.geometry.location
+                        });
+
+                        google.maps.event.addListener(marker, 'click', function() {
+                            const infowindow = new google.maps.InfoWindow();
+                            infowindow.setContent(place.name);
+                            infowindow.open(map, this });
+                    }
                 });
             } else {
                 alert('Geolocation is not supported by this browser.');

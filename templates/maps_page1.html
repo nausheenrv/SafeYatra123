@@ -15,28 +15,25 @@
         #map {
             height: 100%;
             width: 100%;
-            pointer-events: auto; /* Ensure map interactions work */
+            pointer-events: auto;
         }
         .top-bar, .directions-form, .static-icons {
             position: absolute;
             z-index: 1000;
-            pointer-events: auto; /* Allow interactions */
+            pointer-events: auto;
         }
         .top-bar {
             top: 0;
             width: 100%;
-            /* background-color: #ffffff; */
             padding: 10px;
-            /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
             display: flex;
             align-items: center;
         }
         .directions-form {
-            top: 60px;
+            top: 0px;
             width: 100%;
-            background-color: #ffffff;
             padding: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            align-items: center;
             display: none; /* Initially hidden */
         }
         .static-icons {
@@ -61,30 +58,56 @@
             width: 60%;
             height: 60%;
         }
-        .btn{
+        .btn {
             background-color: #0c366d;
             border: #0c366d;
             color: #ffffff;
+        }
+        .travel-modes {
+            margin-left: 8px;
+            display: none;
+            gap: 10px;
+            margin-top: 60px;
+            margin-left: 55px;
+        }
+        .travel-modes button {
+            border: 1px solid #0c366d;
+            color: #0c366d;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .travel-modes button.active {
+            background-color: #0c366d;
         }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y"></script>
 </head>
 <body>
     <!-- Top Bar -->
-    <div class="top-bar">
-        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;"> 
+    <div class="top-bar" id="topBar">
+        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" id="Logo" style="height: 40px;"> 
         <input type="text" id="searchBar" class="form-control mx-2" placeholder="Search for a location" style="flex: 1;">
         <button class="btn btn-primary" onclick="searchLocation()">Search</button>
     </div>
 
     <!-- Directions Form -->
     <div class="directions-form" id="directionsForm">
-        <input type="text" id="startLocation" class="form-control mr-2" placeholder="Start Location" style="flex: 1;">
-        <input type="text" id="endLocation" class="form-control mx-2" placeholder="Destination" style="flex: 1;">
-        <button class="btn btn-primary" onclick="getDirections()">Get Directions</button>
+        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;"> 
+        <input type="text" id="startLocation" class="form-control mr-2" placeholder="Start Location" style="flex: 1; margin-left: 8px;">
+        <input type="text" id="endLocation" class="form-control mr-2" placeholder="Destination" style="flex: 1;">
+        <button class="btn btn-primary" onclick="getDirections()" style="height: 38px;">Get Directions</button>
     </div>
 
-    <!-- Static Icons for Community and Submit Incident -->
+    <!-- Travel Mode Selection -->
+    <div class="travel-modes" id="travelModes">
+        <button onclick="selectTravelMode('DRIVING')" class="active" id="car">Car</button>
+        <button onclick="selectTravelMode('BICYCLING')" id="cycle">Cycle</button>
+        <button onclick="selectTravelMode('WALKING')" id="walking">Walking</button>
+        <button onclick="selectTravelMode('SCOOTER')" id="scooter">Scooter</button>
+    </div>
+
+    <!-- Static Icons for Community, Submit Incident, and Maps -->
     <div class="static-icons">
         <div class="icon" onclick="window.location.href='{{ url_for('community') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/bell.png" alt="Community">
@@ -92,17 +115,18 @@
         <div class="icon" onclick="window.location.href='{{ url_for('submit_incident') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/chat.png" alt="Submit Incident">
         </div>
-        <div class="icon" onclick="window.location.href='{{ url_for('maps') }}'">
+        <div class="icon" onclick="toggleDirectionsMode()">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/map.png" alt="Go to Maps Page">
         </div>
     </div>
-
 
     <!-- Fullscreen Map -->
     <div id="map"></div>
 
     <script>
         let map;
+        let selectedTravelMode = 'DRIVING'; // Default travel mode
+        let directionsRenderer, directionsService;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -110,66 +134,59 @@
                 zoom: 5,
                 disableDefaultUI: true
             });
+
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer.setMap(map);
         }
 
-        function toggleMenu() {
-            const menuBar = document.getElementById('menuBar');
-            menuBar.style.display = menuBar.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleDirections() {
+        function toggleDirectionsMode() {
+            const searchBar = document.getElementById('searchBar');
+            const searchButton = document.querySelector('.btn-primary');
             const directionsForm = document.getElementById('directionsForm');
-            directionsForm.style.display = directionsForm.style.display === 'flex' ? 'none' : 'flex';
+
+            if (searchBar.style.display !== 'none') {
+                searchBar.style.display = 'none';
+                searchButton.style.display = 'none';
+                directionsForm.style.display = 'flex';
+                document.getElementById('travelModes').style.display = 'flex';
+            } else {
+                searchBar.style.display = 'block';
+                searchButton.style.display = 'block';
+                directionsForm.style.display = 'none';
+                document.getElementById('travelModes').style.display = 'none';
+            }
         }
 
-        function searchLocation() {
-            const location = document.getElementById('searchBar').value;
-            const geocoder = new google.maps.Geocoder();
+        function selectTravelMode(mode) {
+            selectedTravelMode = mode;
 
-            geocoder.geocode({ address: location }, (results, status) => {
-                if (status === 'OK') {
-                    map.setCenter(results[0].geometry.location);
-                    map.setZoom(14);
-                    new google.maps.Marker({
-                        map: map,
-                        position: results[0].geometry.location
-                    });
-                } else {
-                    alert('Geocode was not successful due to: ' + status);
-                }
-            });
+            // Highlight the active button
+            const buttons = document.querySelectorAll('.travel-modes button');
+            buttons.forEach(button => button.classList.remove('active'));
+            document.getElementById(mode.toLowerCase()).classList.add('active');
         }
 
         function getDirections() {
             const startLocation = document.getElementById('startLocation').value;
             const endLocation = document.getElementById('endLocation').value;
 
-            const directionsService = new google.maps.DirectionsService();
-            const directionsRenderer = new google.maps.DirectionsRenderer();
-            directionsRenderer.setMap(map);
-
             const request = {
                 origin: startLocation,
                 destination: endLocation,
-                travelMode: google.maps.TravelMode.DRIVING
+                travelMode: google.maps.TravelMode[selectedTravelMode]
             };
 
             directionsService.route(request, (result, status) => {
-                if (status === 'OK') {
+                if (status === google.maps.DirectionsStatus.OK) {
                     directionsRenderer.setDirections(result);
                 } else {
-                    alert('Directions request failed due to: ' + status);
+                    alert('Directions request failed: ' + status);
                 }
             });
-        }
-
-        function redirectTo(page) {
-            window.location.href = page; // Redirect to the specified page
         }
 
         window.onload = initMap;
     </script>
 </body>
 </html>
-
-

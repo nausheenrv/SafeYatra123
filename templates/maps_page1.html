@@ -25,11 +25,10 @@
         .top-bar {
             top: 0;
             width: 100%;
-            /* background-color: #ffffff; */
             padding: 10px;
-            /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
             display: flex;
             align-items: center;
+            background-color: #ffffff;
         }
         .directions-form {
             top: 60px;
@@ -61,18 +60,18 @@
             width: 60%;
             height: 60%;
         }
-        .btn{
+        .btn {
             background-color: #0c366d;
             border: #0c366d;
             color: #ffffff;
         }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y&libraries=places"></script>
 </head>
 <body>
     <!-- Top Bar -->
     <div class="top-bar">
-        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;"> 
+        <img src="{{ url_for('static', filename='uploads/Logo.png') }}" alt="Safe Routing Logo" style="height: 40px;">
         <input type="text" id="searchBar" class="form-control mx-2" placeholder="Search for a location" style="flex: 1;">
         <button class="btn btn-primary" onclick="searchLocation()">Search</button>
     </div>
@@ -84,7 +83,12 @@
         <button class="btn btn-primary" onclick="getDirections()">Get Directions</button>
     </div>
 
-    <!-- Static Icons for Community and Submit Incident -->
+    <!-- Nearby Hospitals Button -->
+    <div style="position: absolute; top: 60px; left: 20px; z-index: 1000;">
+        <button class="btn btn-success" onclick="findNearbyHospitals()">Show Nearby Hospitals</button>
+    </div>
+
+    <!-- Static Icons -->
     <div class="static-icons">
         <div class="icon" onclick="window.location.href='{{ url_for('community') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/bell.png" alt="Community">
@@ -96,7 +100,6 @@
             <img src="https://img.icons8.com/ios-filled/50/0c366d/map.png" alt="Go to Maps Page">
         </div>
     </div>
-
 
     <!-- Fullscreen Map -->
     <div id="map"></div>
@@ -110,16 +113,6 @@
                 zoom: 5,
                 disableDefaultUI: true
             });
-        }
-
-        function toggleMenu() {
-            const menuBar = document.getElementById('menuBar');
-            menuBar.style.display = menuBar.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleDirections() {
-            const directionsForm = document.getElementById('directionsForm');
-            directionsForm.style.display = directionsForm.style.display === 'flex' ? 'none' : 'flex';
         }
 
         function searchLocation() {
@@ -163,11 +156,49 @@
             });
         }
 
-        function redirectTo(page) {
-            window.location.href = page; // Redirect to the specified page
+        function findNearbyHospitals() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    const service = new google.maps.places.PlacesService(map);
+                    service.nearbySearch({
+                        location: userLocation,
+                        radius: 5000,
+                        type: ['hospital']
+                    }, function(results, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            results.forEach(createMarker);
+                        } else {
+                            alert('Nearby search failed due to: ' + status);
+                        }
+                    });
+
+                    function createMarker(place) {
+                        const marker = new google.maps.Marker({
+                            map: map,
+                            position: place.geometry.location
+                        });
+
+                        google.maps.event.addListener(marker, 'click', function() {
+                            const infowindow = new google.maps.InfoWindow();
+                            infowindow.setContent(place.name);
+                            infowindow.open(map, this);
+                        });
+                    }
+                }, function(error) {
+                    alert('Error in getting location: ' + error.message);
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
         }
 
         window.onload = initMap;
     </script>
 </body>
 </html>
+

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby Hospitals</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f8ff; /* Light blue background */
+        }
+        #map {
+            height: 500px; /* Set the height of the map */
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y&libraries=places"></script> <!-- Replace YOUR_API_KEY with your actual API key -->
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Nearby Hospitals</h2>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        function initMap() {
+            // Get the user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    // Create a map centered at the user's location
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 15,
+                        center: userLocation
+                    });
+
+                    // Create a marker for the user's location
+                    var marker = new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: 'Your Location'
+                    });
+
+                    // Search for nearby hospitals
+                    var service = new google.maps.places.PlacesService(map);
+                    service.nearbySearch({
+                        location: userLocation,
+                        radius: 5000, // Search within 5 km
+                        type: ['hospital']
+                    }, function(results, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            for (var i = 0; i < results.length; i++) {
+                                createMarker(results[i]);
+                            }
+                        }
+                    });
+
+                    function createMarker(place) {
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: place.geometry.location
+                        });
+
+                        // Add an info window for each hospital
+                        google.maps.event.addListener(marker, 'click', function() {
+                            var infowindow = new google.maps.InfoWindow();
+                            infowindow.setContent(place.name);
+                            infowindow.open(map, this);
+                        });
+                    }
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Initialize the map when the window loads
+        window.onload = initMap;
+    </script>
+</body>
+</html>

@@ -71,14 +71,14 @@
             margin-left: 55px;
         }
         .travel-modes button {
-            border: 1px solid #0c366d;
-            color: #0c366d;
+            border: 1px solid #000000;
+            color: #000000;
             border-radius: 5px;
             padding: 5px 10px;
             cursor: pointer;
         }
         .travel-modes button.active {
-            background-color: #0c366d;
+            background-color: #061c39;
         }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y&libraries=places"></script>
@@ -104,7 +104,6 @@
     <!-- Travel Mode Selection -->
     <div class="travel-modes" id="travelModes">
         <button onclick="selectTravelMode('DRIVING')" class="active" id="car">Car</button>
-        <button onclick="selectTravelMode('BICYCLING')" id="cycle">Cycle</button>
         <button onclick="selectTravelMode('WALKING')" id="walking">Walking</button>
         <button onclick="selectTravelMode('SCOOTER')" id="scooter">Scooter</button>
     </div>
@@ -115,7 +114,7 @@
             <img src="https://img.icons8.com/ios-filled/50/0c366d/bell.png" alt="Community">
         </div>
         <div class="icon" onclick="window.location.href='{{ url_for('submit_incident') }}'">
-            <img src="https://img.icons8.com/ios-filled/50/0c366d/chat.png" alt="Submit Incident">
+            <img src="https://img.icons8.com/ios-filled/50/0c366d/notepad.png" alt="Submit Incident">
         </div>
         <div class="icon" onclick="window.location.href='{{ url_for('profile_setup') }}'">
             <img src="https://img.icons8.com/ios-filled/50/0c366d/user.png" alt="Profile Setup">
@@ -140,17 +139,79 @@
         const policeIcon = 'https://img.icons8.com/ios-filled/50/0c366d/police-badge.png';
 
         function initMap() {
+            // Create a new map instance
             map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 20.5937, lng: 78.9629 },
-                zoom: 5,
+                zoom: 15, // You can adjust the zoom level as needed
                 disableDefaultUI: true
             });
 
+            // Initialize the directions renderer and service
             directionsRenderer = new google.maps.DirectionsRenderer();
             directionsService = new google.maps.DirectionsService();
             directionsRenderer.setMap(map);
 
+            // Initialize the info window
             infowindow = new google.maps.InfoWindow();
+
+            // Try to get the user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+
+                        // Center the map on the user's location
+                        map.setCenter(userLocation);
+
+                        // Define the custom human icon
+                        const humanIcon = {
+                            url: 'https://img.icons8.com/ios-filled/50/0c366d/marker.png', // URL of the human icon
+                            scaledSize: new google.maps.Size(40, 40), // Adjust the size of the icon
+                            origin: new google.maps.Point(0, 0), // Origin of the icon
+                            anchor: new google.maps.Point(20, 40) // Anchor the icon at the bottom center
+                        };
+
+                        // Add a marker with the custom human icon at the user's location
+                        new google.maps.Marker({
+                            position: userLocation,
+                            map: map,
+                            icon: humanIcon, // Use the custom icon
+                            title: 'Your Location'
+                        });
+                    },
+                    function(error) {
+                        // Handle errors, e.g., user denied location access
+                        console.error('Error getting location:', error);
+                        // Fallback to a default location if the user's location cannot be obtained
+                        map.setCenter({ lat: 20.5937, lng: 78.9629 });
+                    }
+                );
+            } else {
+                // Browser doesn't support Geolocation
+                console.error('Geolocation is not supported by this browser.');
+                // Fallback to a default location
+                map.setCenter({ lat: 20.5937, lng: 78.9629 });
+            }
+        }        
+        
+        function searchLocation() {
+            const location = document.getElementById('searchBar').value;
+            const geocoder = new google.maps.Geocoder();
+
+            geocoder.geocode({ address: location }, (results, status) => {
+                if (status === 'OK') {
+                    map.setCenter(results[0].geometry.location);
+                    map.setZoom(12);
+                    new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location
+                    });
+                } else {
+                    alert('Geocode was not successful due to: ' + status);
+                }
+            });
         }
 
         function findNearby(placeType) {

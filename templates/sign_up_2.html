@@ -62,13 +62,6 @@
 <body>
     <div class="container">
         <h2><b>Sign Up</b></h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
         <form method="POST" action="{{ url_for('sign_up_2') }}">
             <div class="form-group">
                 <label for="password">Password</label>

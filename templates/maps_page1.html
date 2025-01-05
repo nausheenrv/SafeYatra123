@@ -11,11 +11,15 @@
             padding: 0;
             height: 100%;
             width: 100%;
+            overflow: hidden; /* Prevent scrollbars */            
         }
         #map {
-            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            pointer-events: auto;
+            height: 100%;
+            z-index: -1;
         }
         .top-bar, .directions-form, .static-icons {
             position: absolute;
@@ -78,7 +82,7 @@
             cursor: pointer;
         }
         .travel-modes button.active {
-            background-color: #061c39;
+            background-color: #aabacf;
         }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDf34ue6DB4ukLmPqY09YJsZ4FXW_vs98Y&libraries=places"></script>
@@ -255,6 +259,11 @@
                 searchButton.style.display = 'block';
                 directionsForm.style.display = 'none';
                 document.getElementById('travelModes').style.display = 'none';
+
+                // Clear the directions from the map
+                directionsRenderer.setMap(null);
+                directionsRenderer = new google.maps.DirectionsRenderer();
+                directionsRenderer.setMap(map);
             }
         }
 

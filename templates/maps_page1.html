@@ -134,10 +134,6 @@
         let selectedTravelMode = 'DRIVING'; // Default travel mode
         let directionsRenderer, directionsService;
 
-        // Hospital and Police station icon URLs
-        const hospitalIcon = 'https://img.icons8.com/ios-filled/50/0c366d/hospital-room.png';
-        const policeIcon = 'https://img.icons8.com/ios-filled/50/0c366d/police-badge.png';
-
         function initMap() {
             // Create a new map instance
             map = new google.maps.Map(document.getElementById('map'), {
@@ -227,13 +223,10 @@
             service.nearbySearch(request, (results, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
                     results.forEach(place => {
-                        let markerIcon = placeType === 'hospital' ? hospitalIcon : policeIcon;
-
                         const marker = new google.maps.Marker({
                             position: place.geometry.location,
                             map,
-                            title: place.name,
-                            icon: markerIcon // Assign icon based on place type
+                            title: place.name
                         });
 
                         marker.addListener('click', () => {
